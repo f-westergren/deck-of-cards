@@ -5,7 +5,6 @@ import Card from './Card'
 const Deck = () => {
   const [url, setUrl] = useState('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
   const [deck, setDeck] = useState('')
-  const [hasCards, setHasCards] = useState(true)
   const [card, setCard] = useState('')
   const [toggle, setToggle] = useState(false)
   const timerId = useRef();
@@ -26,7 +25,6 @@ const Deck = () => {
         setCard(res.data.cards[0].image)
       } else if (!res.data.success) {
         clearInterval(timerId.current)
-        setHasCards(false)
         alert('No more cards in the deck!')
       } else {
         clearInterval(timerId.current)
