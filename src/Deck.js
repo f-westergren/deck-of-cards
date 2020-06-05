@@ -1,44 +1,61 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import Card from './Card'
+import styled from 'styled-components'
+import Button from './Button'
+
+const Board = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 800px;
+  height: 600px;
+  background-color: seagreen;
+  border-radius: 5px;
+`
 
 const Deck = () => {
-  const [url, setUrl] = useState('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
   const [deck, setDeck] = useState('')
-  const [card, setCard] = useState('')
+  const [cards, setCards] = useState([])
   const [toggle, setToggle] = useState(false)
-  const timerId = useRef();
+  const [deckNum, setDeckNum] = useState(1)
 
   useEffect(() => {
     async function loadDeck() {
-      const res = await axios.get(url)
+      const res = await axios.get('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
+      setCards([])
       setDeck(`https://deckofcardsapi.com/api/deck/${res.data.deck_id}/draw/?count=1`)
     }
-    loadDeck()
-    
-  }, [url])
+    loadDeck() 
+  }, [deckNum])
+
+  const randomDegree = () => Math.random() * (90 - -90) + -90
+
+  const getCard = async () => {
+    const res = await axios.get(deck)
+    if (res.data.success) {
+      setCards(cards => [...cards, {image: res.data.cards[0].image, angle: randomDegree()}])
+    } else {
+      setToggle(false)
+      alert('No more cards in the deck!')
+    }
+  }
 
   useEffect(() => {
-    timerId.current = setInterval(async function drawDecks() {
-      const res = await axios.get(deck)
-      if (res.data.success && toggle) {
-        setCard(res.data.cards[0].image)
-      } else if (!res.data.success) {
-        clearInterval(timerId.current)
-        alert('No more cards in the deck!')
-      } else {
-        clearInterval(timerId.current)
-      }
-    }, 1000)
-    return () => clearInterval(timerId.current)
-  }, [deck, toggle])
-  
+    if (toggle) {
+    const timerId = setInterval(getCard, 1000)
+    console.log('deck', deck)
+    return () => clearInterval(timerId)
+  }})
+
 
   return (
-    <div>
-      <button onClick={() => setToggle(!toggle)}>{toggle? 'Stop drawing' : 'Start drawing'}!</button>
-      <Card img={card} />
-    </div>
+    <Board>
+      {cards.map(c => <Card img={c.image} angle={`${c.angle}deg`} />)}
+      <Button onClick={() => setToggle(!toggle)}>{toggle? 'Stop drawing' : 'Start drawing'}</Button>
+      <Button onClick={() => setDeckNum(deckNum => deckNum + 1)}>Shuffle deck</Button>
+    </Board>
   )
 }
 
