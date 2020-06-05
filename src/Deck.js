@@ -31,7 +31,7 @@ const Deck = () => {
     loadDeck()
   }, [deckNum])
 
-  const randomDegree = () => Math.random() * (90 - -90) + -90
+  const randomDegree = () => Math.random() * (180) + -90
 
   const getCard = async () => {
     const res = await axios.get(deck)
