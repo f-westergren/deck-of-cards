@@ -28,6 +28,7 @@ const Deck = () => {
       setCards([])
       setDeck(`https://deckofcardsapi.com/api/deck/${res.data.deck_id}/draw/?count=1`)
     }
+    loadDeck()
   }, [deckNum])
 
   const randomDegree = () => Math.random() * (90 - -90) + -90
@@ -45,7 +46,6 @@ const Deck = () => {
   useEffect(() => {
     if (toggle) {
     const timerId = setInterval(getCard, 1000)
-    console.log('deck', deck)
     return () => clearInterval(timerId)
   }})
 
